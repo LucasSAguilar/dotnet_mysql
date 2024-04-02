@@ -19,7 +19,7 @@ class Program
                 coletarDados(conn);
                 break;
             case "2":
-                Console.WriteLine("Tela 02");
+                inserirDados(conn);
                 break;
 
         }
@@ -42,8 +42,45 @@ class Program
         return conn;
     }
 
+
+    static void inserirDados(MySqlConnection conn)
+    {
+        Console.Clear();
+
+
+        Console.WriteLine("Qual seu usuário?");
+        String nome = Console.ReadLine() ?? "";
+
+        Console.WriteLine("Qual sua senha?");
+        String senha = Console.ReadLine() ?? "";
+
+        String sql_comando = $"INSERT INTO usuarios (nome, senha) VALUES (@nome, @senha)";
+        
+        try
+        {
+            conn.Open();
+            Console.WriteLine("Conexão aberta");
+            MySqlCommand comando = new MySqlCommand(sql_comando, conn);
+            comando.Parameters.AddWithValue("@nome", nome);
+            comando.Parameters.AddWithValue("@senha", senha);
+
+            int linhasAlteradas = comando.ExecuteNonQuery();
+            if ( linhasAlteradas > 0 )
+            {
+                Console.WriteLine("Dados enviados com sucesso");
+            }
+
+        } catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        } finally { 
+            conn.Close();
+        }
+    }
+
     static void coletarDados(MySqlConnection conn)
     {
+        Console.Clear();
         // Comando que será usado no MySQL:
 
         String sql_comando = "SELECT * FROM usuarios";
