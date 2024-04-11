@@ -7,6 +7,7 @@ class Program {
         Console.WriteLine("1: Coletar dados");
         Console.WriteLine("2: Enviar dados");
         Console.WriteLine("3: Apagar dados");
+        Console.WriteLine("4: Editar dados");
         String respostaUsuario = Console.ReadLine() ?? "";
 
 
@@ -20,7 +21,10 @@ class Program {
                 inserirDados(conn);
                 break;
             case "3":
-                excluirDado(conn, "Lucas");
+                excluirDado(conn, "1");
+                break;
+            case "4":
+                editarDado(conn, "1", "Novo nome");
                 break;
 
         }
@@ -85,12 +89,6 @@ class Program {
             MySqlDataReader reader = comando.ExecuteReader();
 
             while (reader.Read()){
-                /* Colocamos entre () por ordem no banco de dados:
-                   O primeiro dado é o 'Nome', então para acessar é o (0),
-                   O segundo dado é a 'Senha', então para acessar é o (1),
-                   Se tivesse um terceiro dado, seria (2)
-                */
-
                 Console.WriteLine($"Nome: {reader.GetString(0)}, Senha: {reader.GetString(1)}");
                 Console.WriteLine("___________________________________");
             }
@@ -105,14 +103,14 @@ class Program {
         };
     }
 
-    static void excluirDado(MySqlConnection conn, String nome) {
+    static void excluirDado(MySqlConnection conn, String id) {
         Console.Clear();
-        String sql_comando = "DELETE FROM usuarios WHERE nome = @nome";
+        String sql_comando = "DELETE FROM usuarios WHERE id = @id";
 
         try {
             conn.Open();
             MySqlCommand comando = new MySqlCommand(sql_comando, conn);
-            comando.Parameters.AddWithValue("@nome", nome);
+            comando.Parameters.AddWithValue("@id", id);
             comando.ExecuteReader();
 
         } catch (Exception ex){
@@ -121,4 +119,28 @@ class Program {
             conn.Close();
         }
     }
+
+    static void editarDado(MySqlConnection conn, String id, String novo_nome)
+    {
+        Console.Clear();
+        String sql_comando = "UPDATE usuarios SET nome = @nome WHERE id = @id";
+
+        try
+        {
+            conn.Open();
+            MySqlCommand comando = new MySqlCommand(sql_comando, conn);
+            comando.Parameters.AddWithValue("@id", id);
+            comando.Parameters.AddWithValue("@nome", novo_nome);
+            comando.ExecuteReader();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ocorreu um erro: {ex}");
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
 }
+
