@@ -1,33 +1,32 @@
-﻿using MySql.Data.MySqlClient;
+﻿ using MySql.Data.MySqlClient;
 
-class Program
-{
-    static void Main()
-    {
+class Program {
+    static void Main() {
 
         Console.WriteLine("Escreva o que deseja fazer: ");
         Console.WriteLine("1: Coletar dados");
         Console.WriteLine("2: Enviar dados");
+        Console.WriteLine("3: Apagar dados");
         String respostaUsuario = Console.ReadLine() ?? "";
 
 
         MySqlConnection conn = abrirConexao();
         
-        switch (respostaUsuario)
-        {
+        switch (respostaUsuario) {
             case "1":
                 coletarDados(conn);
                 break;
             case "2":
                 inserirDados(conn);
                 break;
+            case "3":
+                excluirDado(conn, "Lucas");
+                break;
 
         }
-
     }
 
-    static MySqlConnection abrirConexao()
-    {
+    static MySqlConnection abrirConexao() {
         /*
            String para conexão:
 
@@ -43,8 +42,7 @@ class Program
     }
 
 
-    static void inserirDados(MySqlConnection conn)
-    {
+    static void inserirDados(MySqlConnection conn) {
         Console.Clear();
 
 
@@ -56,8 +54,7 @@ class Program
 
         String sql_comando = $"INSERT INTO usuarios (nome, senha) VALUES (@nome, @senha)";
         
-        try
-        {
+        try {
             conn.Open();
             Console.WriteLine("Conexão aberta");
             MySqlCommand comando = new MySqlCommand(sql_comando, conn);
@@ -65,34 +62,29 @@ class Program
             comando.Parameters.AddWithValue("@senha", senha);
 
             int linhasAlteradas = comando.ExecuteNonQuery();
-            if ( linhasAlteradas > 0 )
-            {
+            if ( linhasAlteradas > 0 ) {
                 Console.WriteLine("Dados enviados com sucesso");
             }
 
-        } catch (Exception ex)
-        {
+        } catch (Exception ex){
             Console.WriteLine(ex.Message);
         } finally { 
             conn.Close();
         }
     }
 
-    static void coletarDados(MySqlConnection conn)
-    {
+    static void coletarDados(MySqlConnection conn) {
         Console.Clear();
         // Comando que será usado no MySQL:
 
         String sql_comando = "SELECT * FROM usuarios";
-        try
-        {
+        try {
             conn.Open();
             Console.WriteLine("Conexão aberta");
             MySqlCommand comando = new MySqlCommand(sql_comando, conn);
             MySqlDataReader reader = comando.ExecuteReader();
 
-            while (reader.Read())
-            {
+            while (reader.Read()){
                 /* Colocamos entre () por ordem no banco de dados:
                    O primeiro dado é o 'Nome', então para acessar é o (0),
                    O segundo dado é a 'Senha', então para acessar é o (1),
@@ -104,15 +96,29 @@ class Program
             }
 
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine(ex.Message);
         }
-        finally
-        {
+        finally {
             conn.Close();
             Console.WriteLine("Conexão finalizada");
         };
     }
-}
 
+    static void excluirDado(MySqlConnection conn, String nome) {
+        Console.Clear();
+        String sql_comando = "DELETE FROM usuarios WHERE nome = @nome";
+
+        try {
+            conn.Open();
+            MySqlCommand comando = new MySqlCommand(sql_comando, conn);
+            comando.Parameters.AddWithValue("@nome", nome);
+            comando.ExecuteReader();
+
+        } catch (Exception ex){
+            Console.WriteLine($"Ocorreu um erro: {ex}");
+        } finally{
+            conn.Close();
+        }
+    }
+}
